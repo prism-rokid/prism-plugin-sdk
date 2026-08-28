@@ -3,6 +3,12 @@ name: Publish SDK packages
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing SDK version to republish after a registry-side failure
+        required: true
+        default: 0.1.0
 
 permissions:
   contents: write
@@ -16,12 +22,20 @@ jobs:
       version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - id: version
         shell: bash
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
-          test "$GITHUB_REF_NAME" = "v$version"
+          version="${{ inputs.version }}"
+          if [[ -z "$version" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            test "$GITHUB_REF_NAME" = "v$version"
+          else
+            git rev-parse --verify "refs/tags/v$version"
+            git diff --quiet "v$version" -- . ':(exclude).github/workflows/publish.yml'
+          fi
           test "$(node -p "require('./node/package.json').version")" = "$version"
           test "$(python -c "import tomllib; print(tomllib.load(open('python/pyproject.toml', 'rb'))['project']['version'])")" = "$version"
           echo "value=$version" >> "$GITHUB_OUTPUT"
