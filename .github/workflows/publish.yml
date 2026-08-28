@@ -9,6 +9,14 @@ on:
         description: Existing SDK version to republish after a registry-side failure
         required: true
         default: 0.1.0
+      publish_npm:
+        description: Publish the Node package
+        type: boolean
+        default: true
+      publish_pypi:
+        description: Publish the Python package
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -55,6 +63,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
   npm:
     needs: verify-version
+    if: github.event_name != 'workflow_dispatch' || inputs.publish_npm
     runs-on: ubuntu-latest
     environment: npm
     steps:
@@ -67,8 +76,11 @@ jobs:
       - run: npm test --prefix node
       - run: npm publish --access public --provenance --registry=https://registry.npmjs.org
         working-directory: node
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   pypi:
     needs: verify-version
+    if: github.event_name != 'workflow_dispatch' || inputs.publish_pypi
     runs-on: ubuntu-latest
     environment:
       name: pypi
