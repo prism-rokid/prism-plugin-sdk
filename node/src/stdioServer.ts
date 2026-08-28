@@ -1,5 +1,5 @@
 /**
- * @rokid/pluginbridge-plugin-sdk — stdio server core.
+ * @rokid-prism/pluginbridge-plugin-sdk — stdio server core.
  *
  * Reads JSON-over-newline-stdio requests from stdin, dispatches them to the
  * wrapped PluginAdapter, and writes responses/events to stdout. Plugin authors

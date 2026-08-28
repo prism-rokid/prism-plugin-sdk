@@ -1,5 +1,5 @@
 /**
- * @rokid/pluginbridge-plugin-sdk — TypeScript type definitions.
+ * @rokid-prism/pluginbridge-plugin-sdk — TypeScript type definitions.
  *
  * SDK-facing fields stay aligned with the Go SDK (sdk/go/types.go) and Prism
  * runtime types. stdioServer converts them to the v4 snake_case wire format.

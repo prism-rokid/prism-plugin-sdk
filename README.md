@@ -4,9 +4,9 @@ The public, MIT-licensed PluginBridge v4 SDK for Prism plugins.
 
 | Language | Distribution | Install |
 | --- | --- | --- |
-| Go | `github.com/Rokid-Prism/prism-plugin-sdk` | `go get github.com/Rokid-Prism/prism-plugin-sdk@v0.1.0` |
-| Node.js | `@rokid/pluginbridge-plugin-sdk` | `npm install @rokid/pluginbridge-plugin-sdk@0.1.0` |
-| Python | `rokid-pluginbridge-plugin-sdk` | `pip install rokid-pluginbridge-plugin-sdk==0.1.0` |
+| Go | `github.com/Rokid-Prism/prism-plugin-sdk` | `go get github.com/Rokid-Prism/prism-plugin-sdk@v0.1.1` |
+| Node.js | `@rokid-prism/pluginbridge-plugin-sdk` | `npm install @rokid-prism/pluginbridge-plugin-sdk@0.1.1` |
+| Python | `rokid-pluginbridge-plugin-sdk` | `pip install rokid-pluginbridge-plugin-sdk==0.1.1` |
 
 All SDKs expose the PluginBridge v4 JSON-lines stdio server. Plugin-facing
 types use idiomatic language naming; the server converts them to the locked
@@ -18,8 +18,8 @@ import pluginbridge "github.com/Rokid-Prism/prism-plugin-sdk"
 ```
 
 ```ts
-import { serve } from "@rokid/pluginbridge-plugin-sdk";
-// CommonJS: const { serve } = require("@rokid/pluginbridge-plugin-sdk");
+import { serve } from "@rokid-prism/pluginbridge-plugin-sdk";
+// CommonJS: const { serve } = require("@rokid-prism/pluginbridge-plugin-sdk");
 ```
 
 ```python
@@ -28,7 +28,7 @@ from pluginbridge import serve
 
 ## Node module formats
 
-`@rokid/pluginbridge-plugin-sdk` exports both ESM and CommonJS entry points.
+`@rokid-prism/pluginbridge-plugin-sdk` exports both ESM and CommonJS entry points.
 Use `import` from ESM or `require` from CommonJS; TypeScript declarations are
 shared. The `/desktop-automation-runtime` and `/cdp-runtime` subpaths remain
 CommonJS for existing Codex and Hermes adapters.

@@ -1,6 +1,6 @@
 {
-  "name": "@rokid/pluginbridge-plugin-sdk",
-  "version": "0.1.0",
+  "name": "@rokid-prism/pluginbridge-plugin-sdk",
+  "version": "0.1.1",
   "description": "Official Node/TypeScript SDK for building PluginBridge plugins",
   "type": "module",
   "main": "./dist/cjs/src/index.js",

@@ -4,7 +4,7 @@
  * The SDK ships both:
  * - this typed target/env model
  * - a CommonJS runtime helper at
- *   `@rokid/pluginbridge-plugin-sdk/desktop-automation-runtime`
+ *   `@rokid-prism/pluginbridge-plugin-sdk/desktop-automation-runtime`
  *
  * This keeps official plugins and future user plugins on the same
  * cross-platform bundle-id / executable / window-title conventions.

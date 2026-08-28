@@ -1,4 +1,4 @@
-/** Public API of @rokid/pluginbridge-plugin-sdk. */
+/** Public API of @rokid-prism/pluginbridge-plugin-sdk. */
 export { serve, createStdioServer, checkProtocolVersion } from "./stdioServer.js";
 export type { StdioServerOptions } from "./stdioServer.js";
 export {

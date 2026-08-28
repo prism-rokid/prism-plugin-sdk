@@ -1,19 +1,19 @@
-# @rokid/pluginbridge-plugin-sdk (Node/TypeScript)
+# @rokid-prism/pluginbridge-plugin-sdk (Node/TypeScript)
 
 Official Node/TypeScript SDK for building PluginBridge plugins.
 
-The package name is fixed as `@rokid/pluginbridge-plugin-sdk`.
+The package name is fixed as `@rokid-prism/pluginbridge-plugin-sdk`.
 Install the published package from npm (the repository development path is
 `node/`).
 
 ## Quick start
 
 ```sh
-npm install @rokid/pluginbridge-plugin-sdk
+npm install @rokid-prism/pluginbridge-plugin-sdk
 ```
 
 ```typescript
-import { serve, type PluginAdapter } from "@rokid/pluginbridge-plugin-sdk";
+import { serve, type PluginAdapter } from "@rokid-prism/pluginbridge-plugin-sdk";
 
 class MyAdapter implements PluginAdapter {
   id() { return "acme.tool"; }
@@ -102,13 +102,13 @@ Node SDK 现在导出了统一的平台目标模型：
 并且提供了可直接复用的 CommonJS 运行时：
 
 ```js
-const desktopAutomation = require("@rokid/pluginbridge-plugin-sdk/desktop-automation-runtime");
+const desktopAutomation = require("@rokid-prism/pluginbridge-plugin-sdk/desktop-automation-runtime");
 ```
 
 如果插件要对接 Electron / Chromium 桌面端，SDK 提供的是通用 CDP 运行时：
 
 ```js
-const { CdpPageClient } = require("@rokid/pluginbridge-plugin-sdk/cdp-runtime");
+const { CdpPageClient } = require("@rokid-prism/pluginbridge-plugin-sdk/cdp-runtime");
 ```
 
 约定是：
