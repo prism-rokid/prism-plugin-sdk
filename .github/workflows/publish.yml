@@ -42,13 +42,15 @@ jobs:
   github-release:
     needs: verify-version
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.verify-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
       - run: go test ./...
-      - run: gh release view "$GITHUB_REF_NAME" || gh release create "$GITHUB_REF_NAME" --generate-notes
+      - run: gh release view "v$VERSION" || gh release create "v$VERSION" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
   npm:
