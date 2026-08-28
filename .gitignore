@@ -1,0 +1,15 @@
+# Node
+node/node_modules/
+node/dist/
+
+# Python
+python/.venv/
+python/.pytest_cache/
+python/build/
+python/dist/
+python/*.egg-info/
+python/src/*.egg-info/
+python/src/**/*.egg-info/
+
+# OS/editor
+.DS_Store

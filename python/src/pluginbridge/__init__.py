@@ -1,0 +1,105 @@
+"""rokid-pluginbridge-plugin-sdk — official Python SDK for PluginBridge plugins.
+
+A plugin implements the PluginAdapter abstract class and calls ``serve(adapter)``.
+The SDK handles the JSON-over-stdio protocol (request dispatch, response
+encoding, event forwarding) so the plugin author only writes native-product-specific
+logic.
+
+JSON wire fields are snake_case. Python dataclass fields are converted at the
+stdio boundary and remain aligned with the Go SDK and Prism runtime types.
+See docs/06 for the protocol specification.
+"""
+
+from .types import (
+    PROTOCOL_VERSION,
+    AgentUsage,
+    AgentUsageFiveHour,
+    AgentUsageWeekly,
+    AccountUsageSummary,
+    PluginAdapter,
+    PluginEvent,
+    ApprovalResolutionRequest,
+    ApprovalResolver,
+    AttachSessionRequest,
+    Capability,
+    ControlSessionRequest,
+    ControlSessionResult,
+    ManagedTerminalLauncher,
+    ManagedTerminalRequest,
+    ManagedTerminalResult,
+    DiscoveryResult,
+    DraftControlRequest,
+    DraftControlResult,
+    DraftOpenRequest,
+    DraftOpenResult,
+    HistoryMessage,
+    HistoryProgress,
+    HistoryProgressStep,
+    HistoryStreamEvent,
+    HistoryStreamRequest,
+    HistoryTurn,
+    Attachment,
+    InboundMessage,
+    IntegrationMode,
+    NativeSession,
+    NativeSessionHint,
+    RemoteConversationAdapter,
+    RunStatus,
+    SendReceipt,
+    StartSessionWithMessageRequest,
+    StartSessionWithMessageResult,
+    StartDraftWithMessageRequest,
+    StatusReader,
+    SessionController,
+    VisibilityResult,
+)
+from .stdio_server import check_protocol_version, serve, StdioServer
+
+__all__ = [
+    "PROTOCOL_VERSION",
+    "AgentUsage",
+    "AgentUsageFiveHour",
+    "AgentUsageWeekly",
+    "AccountUsageSummary",
+    "serve",
+    "StdioServer",
+    "check_protocol_version",
+    "PluginAdapter",
+    "PluginEvent",
+    "ApprovalResolutionRequest",
+    "ApprovalResolver",
+    "AttachSessionRequest",
+    "Capability",
+    "ControlSessionRequest",
+    "ControlSessionResult",
+    "ManagedTerminalLauncher",
+    "ManagedTerminalRequest",
+    "ManagedTerminalResult",
+    "DiscoveryResult",
+    "DraftControlRequest",
+    "DraftControlResult",
+    "DraftOpenRequest",
+    "DraftOpenResult",
+    "HistoryMessage",
+    "HistoryProgress",
+    "HistoryProgressStep",
+    "HistoryStreamEvent",
+    "HistoryStreamRequest",
+    "HistoryTurn",
+    "Attachment",
+    "InboundMessage",
+    "IntegrationMode",
+    "NativeSession",
+    "NativeSessionHint",
+    "RemoteConversationAdapter",
+    "RunStatus",
+    "SendReceipt",
+    "StartSessionWithMessageRequest",
+    "StartSessionWithMessageResult",
+    "StartDraftWithMessageRequest",
+    "StatusReader",
+    "SessionController",
+    "VisibilityResult",
+]
+
+__version__ = "0.1.0"

@@ -1,0 +1,14 @@
+name: Validate official PluginBridge manifest
+description: Validates the strict v4 schema and requires both official icon URLs.
+inputs:
+  manifest:
+    description: Path to pluginbridge-plugin.yaml or .json.
+    required: false
+    default: pluginbridge-plugin.yaml
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: npm ci --prefix "$GITHUB_ACTION_PATH/../../node" --registry=https://registry.npmmirror.com
+    - shell: bash
+      run: node "$GITHUB_ACTION_PATH/../../node/scripts/validate-official-manifest.mjs" "${{ inputs.manifest }}"

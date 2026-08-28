@@ -1,0 +1,13 @@
+{
+  "id": "codex",
+  "display_name": "Codex",
+  "description": "Official Codex adapter.",
+  "version": "0.1.15",
+  "icon_url": "https://registry.npmmirror.com/@lobehub/icons-static-avatar/latest/files/avatars/codex.webp",
+  "icon_svg_url": "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/codex.svg",
+  "integration_mode": "desktop-automation",
+  "transport": "process",
+  "command": ["${runtime.node}", "dist/index.js"],
+  "runtime_dependencies": { "node": ">=22.0.0 <23.0.0" },
+  "capabilities": { "native_visible_input": true, "can_forward_sync": true }
+}

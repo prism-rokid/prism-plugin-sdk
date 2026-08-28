@@ -1,0 +1,55 @@
+{
+  "name": "@rokid/pluginbridge-plugin-sdk",
+  "version": "0.1.0",
+  "description": "Official Node/TypeScript SDK for building PluginBridge plugins",
+  "type": "module",
+  "main": "./dist/cjs/src/index.js",
+  "module": "./dist/esm/src/index.js",
+  "types": "./dist/esm/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/src/index.d.ts",
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js",
+      "default": "./dist/esm/src/index.js"
+    },
+    "./desktop-automation-runtime": {
+      "require": "./runtime/desktop_automation.cjs"
+    },
+    "./cdp-runtime": {
+      "require": "./runtime/cdp_client.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "runtime",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && node scripts/write-cjs-package.mjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "clean": "node scripts/clean.mjs",
+    "test": "npm run build && node --test dist/esm/src/**/*.test.js && node -e \"require('./dist/cjs/src/index.js')\"",
+    "validate-manifest": "node scripts/validate-manifest.mjs",
+    "validate-official-manifest": "node scripts/validate-official-manifest.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pluginbridge",
+    "rokid",
+    "prism",
+    "plugin",
+    "sdk"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ajv": "^8.17.1",
+    "typescript": "^5.5.0",
+    "yaml": "^2.5.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

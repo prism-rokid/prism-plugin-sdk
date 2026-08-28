@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - run: go test ./...
+      - run: go vet ./...
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmmirror.com'
+          cache: npm
+          cache-dependency-path: node/package-lock.json
+      - run: npm ci --prefix node --registry=https://registry.npmmirror.com
+      - run: npm test --prefix node
+      - run: npm run validate-manifest --prefix node -- ../conformance/manifest.valid.json
+      - name: Reject unknown manifest fields
+        run: |
+          if npm run validate-manifest --prefix node -- ../conformance/manifest.invalid-unknown-field.json; then
+            echo 'expected invalid manifest to fail' >&2
+            exit 1
+          fi
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --upgrade pip build pytest -i https://mirrors.aliyun.com/pypi/simple
+      - run: python -m pip install ./python -i https://mirrors.aliyun.com/pypi/simple
+      - run: python -m pytest python/tests
+      - run: python -m build python

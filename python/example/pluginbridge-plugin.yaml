@@ -1,0 +1,12 @@
+id: echo.example
+display_name: Echo Example Adapter (Python)
+version: 0.1.0
+transport: process
+command: ["python3", "echo_adapter.py"]
+mode: echo
+capabilities:
+  native_visible_input: true
+  native_visible_output: true
+  can_start_session_with_message: true
+  can_list_sessions: false
+  can_read_history: false

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rokid-pluginbridge-plugin-sdk"
+version = "0.1.0"
+description = "Official Python SDK for building PluginBridge plugins"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+keywords = ["pluginbridge", "rokid", "prism", "plugin", "sdk"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/Rokid-Prism/prism-plugin-sdk"
+Documentation = "https://github.com/Rokid-Prism/prism-plugin-sdk#readme"
+Repository = "https://github.com/Rokid-Prism/prism-plugin-sdk"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

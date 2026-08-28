@@ -1,0 +1,10 @@
+{
+  "id": "bad-plugin",
+  "display_name": "Bad Plugin",
+  "version": "0.1.0",
+  "integration_mode": "protocol-native",
+  "transport": "process",
+  "command": ["./adapter"],
+  "capabilities": {},
+  "unexpected": true
+}
