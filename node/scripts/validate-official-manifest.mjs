@@ -10,7 +10,10 @@ const source = await readFile(path, "utf8");
 const manifest = path.endsWith(".json") ? JSON.parse(source) : parseDocument(source, { uniqueKeys: true }).toJS();
 const validate = new Ajv({ allErrors: true, strict: true }).compile(schema);
 if (!validate(manifest)) throw new Error(`manifest schema failure: ${JSON.stringify(validate.errors)}`);
-for (const field of ["icon_url", "icon_svg_url"]) {
+if (manifest.schema_version !== 1) {
+  throw new Error("official plugin manifest requires schema_version: 1");
+}
+for (const field of ["plugin_protocol_version", "icon_url", "icon_svg_url"]) {
   if (typeof manifest[field] !== "string" || manifest[field].trim() === "") {
     throw new Error(`official plugin manifest requires ${field}`);
   }

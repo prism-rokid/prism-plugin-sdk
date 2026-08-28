@@ -38,7 +38,9 @@ CommonJS for existing Codex and Hermes adapters.
 [`conformance/manifest.schema.json`](conformance/manifest.schema.json) is the
 strict JSON Schema for a PluginBridge v4 manifest. It permits legacy plugins
 to omit icons, but official plugin release CI must require both `icon_url` and
-`icon_svg_url`.
+`icon_svg_url`. The same official release check requires `schema_version: 1`
+and `plugin_protocol_version: "4"`; the base schema leaves them optional only
+for legacy and third-party compatibility.
 
 - `icon_url`: optional absolute HTTPS bitmap URL (max 1024 characters).
 - `icon_svg_url`: optional absolute HTTPS SVG URL (max 1024 characters).

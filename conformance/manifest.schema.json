@@ -6,6 +6,8 @@
   "additionalProperties": false,
   "required": ["id", "display_name", "version", "integration_mode", "transport", "command", "capabilities"],
   "properties": {
+    "schema_version": { "const": 1 },
+    "plugin_protocol_version": { "const": "4" },
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{0,127}$" },
     "display_name": { "type": "string", "minLength": 1, "maxLength": 256 },
     "description": { "type": "string", "maxLength": 4096 },

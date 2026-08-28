@@ -1,4 +1,6 @@
 {
+  "schema_version": 1,
+  "plugin_protocol_version": "4",
   "id": "codex",
   "display_name": "Codex",
   "description": "Official Codex adapter.",
