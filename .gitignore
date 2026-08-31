@@ -13,3 +13,22 @@ python/src/**/*.egg-info/
 
 # OS/editor
 .DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Go build and test artifacts
+go/bin/
+go/coverage.out
+coverage/
+test-results/
+
+# Local configuration and package artifacts
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.log
+*.tgz
