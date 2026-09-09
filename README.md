@@ -1,12 +1,9 @@
 # Rokid Prism
 
-> Your agents, in one calm place.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](./LICENSE)
 
-This repository hosts the **Prism Plugin SDK** — the heart of the open-source [Rokid-Prism](https://github.com/Rokid-Prism) organization — and its README doubles as the organization's front door.
+**English** / [中文](#中文)
 
-**English** · [中文](#中文)
 
 ## What is Prism?
 
@@ -153,15 +150,13 @@ Improvements to the SDK itself — new helpers, docs, bug fixes — are welcome 
 
 # 中文
 
-**[English](#what-is-prism)** · **中文**
+**[English](#what-is-prism)** / **中文**
 
-> 你的智能体，收进一个安静的地方。
 
-本仓库托管 **Prism Plugin SDK** —— 开源组织 [Rokid-Prism](https://github.com/Rokid-Prism) 的核心 —— 本 README 同时作为组织的门面文档。
 
 ## Prism 是什么？
 
-Prism 让 AI 编程智能体在最适合它们的地方运行——你的桌面——同时让你在任何地方都保持掌控。让 Claude Code、Codex、Hermes 或 OpenClaw 在你的 Mac 或 PC 上持续工作，然后拿起手机、或戴上 Rokid 眼镜，随时查看进度、继续对话、处理审批，或发起新任务。
+Prism 让你能从手机等移动设备连接桌面端Agent。让 Codex、Hermes 或 OpenClaw 在你的 Mac 或 PC 上持续工作，然后拿起手机、或戴上 Rokid 眼镜，随时随地查看进度、继续对话、处理审批，或发起新任务。
 
 Rokid-Prism 组织托管这个生态的开源部分：**PluginBridge SDK**（本仓库）与连接 Prism 和本地智能体的**官方插件**。
 
