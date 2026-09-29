@@ -181,6 +181,8 @@ class ControlSessionResult:
 class ManagedTerminalRequest:
     plugin_id: str = ""
     cwd: str = ""
+    native_session_id: str = ""
+    native_thread_id: str = ""
 
 
 @dataclass

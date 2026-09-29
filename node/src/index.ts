@@ -3,6 +3,7 @@ export { serve, createStdioServer, checkProtocolVersion } from "./stdioServer.js
 export type { StdioServerOptions } from "./stdioServer.js";
 export {
   PROTOCOL_VERSION,
+  PluginAdapterError,
 } from "./types.js";
 export {
   platformName,
@@ -33,6 +34,8 @@ export type {
   Attachment,
   InboundMessage,
   IntegrationMode,
+  ManagedTerminalRequest,
+  ManagedTerminalResult,
   NativeSession,
   NativeSessionHint,
   RpcError,
@@ -44,8 +47,8 @@ export type {
   RunWaiter,
   SendReceipt,
   StartSessionWithMessageRequest,
-	StartSessionWithMessageResult,
-	StartDraftWithMessageRequest,
+  StartSessionWithMessageResult,
+  StartDraftWithMessageRequest,
   StatusReader,
   SessionController,
   VisibilityResult,

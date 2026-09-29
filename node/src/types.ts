@@ -160,6 +160,17 @@ export interface ControlSessionResult {
 export interface ManagedTerminalRequest {
   plugin_id: string;
   cwd?: string;
+  /** Existing native session to attach. Omit when opening a new terminal. */
+  native_session_id?: string;
+  native_thread_id?: string;
+}
+
+/** Explicit semantic failure returned by an adapter over the stdio RPC boundary. */
+export class PluginAdapterError extends Error {
+  constructor(public readonly code: string, message: string) {
+    super(message);
+    this.name = "PluginAdapterError";
+  }
 }
 
 export interface ManagedTerminalResult {
@@ -365,6 +376,8 @@ export interface PluginAdapter {
   openManagedTerminal?(req: ManagedTerminalRequest): ManagedTerminalResult | Promise<ManagedTerminalResult>;
   send(session: NativeSession, msg: InboundMessage): SendReceipt | Promise<SendReceipt>;
   subscribe(session: NativeSession, signal?: AbortSignal): AsyncIterable<PluginEvent> | Promise<AsyncIterable<PluginEvent>>;
+  /** Optional Hub acknowledgement after a durable native event is handled. */
+  ackEvent?(session: NativeSession, eventID: string): void | Promise<void>;
   /** Optional Plugin-wide reverse watcher. Events must carry the real native session in Payload.native_session. */
   subscribePlugin?(signal?: AbortSignal): AsyncIterable<PluginEvent> | Promise<AsyncIterable<PluginEvent>>;
   /** Optional account-level display projection for the Agent card. */

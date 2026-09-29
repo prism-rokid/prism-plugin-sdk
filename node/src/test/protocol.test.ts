@@ -8,6 +8,7 @@ import { Readable, Writable } from "node:stream";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createStdioServer } from "../stdioServer.js";
+import { PluginAdapterError } from "../types.js";
 import type { PluginAdapter, ApprovalResolutionRequest, AttachSessionRequest, Capability, ControlSessionRequest, ControlSessionResult, DraftControlRequest, DraftControlResult, HistoryStreamEvent, HistoryStreamRequest, NativeSession, NativeSessionHint, RpcResponse, RunStatus, StartSessionWithMessageRequest } from "../types.js";
 
 const sharedFixture = JSON.parse(readFileSync(fileURLToPath(new URL("../../../../../conformance/v4-plugin-wide.json", import.meta.url)), "utf8")) as {
@@ -219,6 +220,22 @@ test("optional session methods return correct responses", async () => {
   assert.equal((session as unknown as Record<string, unknown>).visible, true);
 });
 
+test("durable event acknowledgement reaches the matching adapter session", async () => {
+  class AckAdapter extends StubAdapter {
+    acked?: { session: NativeSession; eventID: string };
+    async ackEvent(session: NativeSession, eventID: string) { this.acked = { session, eventID }; }
+  }
+  const adapter = new AckAdapter();
+  const out = await runRoundTrip(JSON.stringify({
+    id: "ack-1", method: "adapter.ackEvent",
+    params: { session: { plugin_id: "stub", native_session_id: "native-1" }, event_id: "native-1:event-1" },
+  }) + "\n", adapter);
+  const response = JSON.parse(out.trim()) as RpcResponse;
+  assert.equal(response.ok, true);
+  assert.equal(adapter.acked?.session.NativeSessionID, "native-1");
+  assert.equal(adapter.acked?.eventID, "native-1:event-1");
+});
+
 test("durable detail uses the direct snake_case wire projection", async () => {
   const out = await runRoundTrip(JSON.stringify({
     id: "detail-1",
@@ -297,12 +314,35 @@ test("managed terminal uses the local-only snake_case protocol contract", async 
   const out = await runRoundTrip(JSON.stringify({
     id: "managed-terminal-1",
     method: "adapter.openManagedTerminal",
-    params: { plugin_id: "stub", cwd: "/tmp/prism-managed-terminal" },
+    params: {
+      plugin_id: "stub", cwd: "/tmp/prism-managed-terminal",
+      native_session_id: "native-session-1", native_thread_id: "native-thread-1",
+    },
   }) + "\n", adapter);
   const response = JSON.parse(out.trim()) as RpcResponse;
   assert.equal(response.ok, true);
-  assert.deepEqual(adapter.managedTerminalRequest, { plugin_id: "stub", cwd: "/tmp/prism-managed-terminal" });
+  assert.deepEqual(adapter.managedTerminalRequest, {
+    plugin_id: "stub", cwd: "/tmp/prism-managed-terminal",
+    native_session_id: "native-session-1", native_thread_id: "native-thread-1",
+  });
   assert.deepEqual(response.payload, { ok: true, message: "managed terminal opened" });
+});
+
+test("adapter semantic error code crosses the stdio boundary", async () => {
+  class FailingAdapter extends StubAdapter {
+    async send(): Promise<never> {
+      throw new PluginAdapterError("delivery_indeterminate", "native submission is uncertain");
+    }
+  }
+  const out = await runRoundTrip(JSON.stringify({
+    id: "uncertain-1", method: "adapter.send", params: {
+      session: { plugin_id: "stub", native_session_id: "session-1" },
+      message: { prism_message_id: "message-1", text: "hello" },
+    },
+  }) + "\n", new FailingAdapter());
+  const response = JSON.parse(out.trim()) as RpcResponse;
+  assert.equal(response.ok, false);
+  assert.deepEqual(response.error, { code: "delivery_indeterminate", message: "native submission is uncertain" });
 });
 
 class PluginWideFixtureAdapter extends StubAdapter {

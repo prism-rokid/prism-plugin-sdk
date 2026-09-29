@@ -330,6 +330,8 @@ class StdioServer:
                 self._send_response(req_id, True, self.adapter.open_managed_terminal(ManagedTerminalRequest(
                     plugin_id=params.get("PluginID", ""),
                     cwd=params.get("Cwd", ""),
+                    native_session_id=params.get("NativeSessionID", ""),
+                    native_thread_id=params.get("NativeThreadID", ""),
                 )))
             elif method == "adapter.subscribePlugin":
                 subscription_id = params.get("SubscriptionID") or str(uuid.uuid4())

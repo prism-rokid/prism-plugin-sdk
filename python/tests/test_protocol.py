@@ -17,6 +17,8 @@ from pluginbridge import (
     ControlSessionResult,
     DiscoveryResult,
     HistoryStreamEvent,
+    ManagedTerminalRequest,
+    ManagedTerminalLauncher,
     NativeSessionHint,
     NativeSession,
     SendReceipt,
@@ -122,6 +124,14 @@ class ControlStatusAdapter(StubAdapter, StatusReader, SessionController):
             "conversation_id": session.NativeSessionID,
             "current_model": {"key": "gpt-test", "label": "GPT Test"},
         }
+
+
+class ManagedTerminalAdapter(StubAdapter, ManagedTerminalLauncher):
+    managed_request: ManagedTerminalRequest | None = None
+
+    def open_managed_terminal(self, req: ManagedTerminalRequest):
+        self.managed_request = req
+        return {"ok": True, "message": "attached"}
 
 
 class PluginWideFixtureAdapter(StubAdapter):
@@ -295,6 +305,22 @@ def test_read_detail_preserves_session_and_dynamic_snapshot_keys():
     payload = json.loads(output.strip())["payload"]
     assert payload["conversation_id"] == "session-1"
     assert payload["current_model"] == {"key": "gpt-test", "label": "GPT Test"}
+
+
+def test_managed_terminal_passes_existing_native_session_identity():
+    adapter = ManagedTerminalAdapter()
+    req = json.dumps({
+        "id": "req-terminal", "method": "adapter.openManagedTerminal",
+        "params": {
+            "plugin_id": "stub", "cwd": "/tmp/project",
+            "native_session_id": "session-1", "native_thread_id": "thread-1",
+        },
+    }) + "\n"
+    output = _run_round_trip(req, adapter)
+    assert json.loads(output.strip())["payload"]["ok"] is True
+    assert adapter.managed_request is not None
+    assert adapter.managed_request.native_session_id == "session-1"
+    assert adapter.managed_request.native_thread_id == "thread-1"
 
 
 def test_history_stream_error_serializes_retryable():

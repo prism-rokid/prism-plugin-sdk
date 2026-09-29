@@ -367,8 +367,10 @@ type ControlSessionResult struct {
 }
 
 type ManagedTerminalRequest struct {
-	PluginID string `json:"plugin_id"`
-	Cwd      string `json:"cwd,omitempty"`
+	PluginID        string `json:"plugin_id"`
+	Cwd             string `json:"cwd,omitempty"`
+	NativeSessionID string `json:"native_session_id,omitempty"`
+	NativeThreadID  string `json:"native_thread_id,omitempty"`
 }
 
 type ManagedTerminalResult struct {

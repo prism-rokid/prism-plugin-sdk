@@ -24,7 +24,7 @@ import type {
   DraftControlRequest,
   StartDraftWithMessageRequest,
 } from "./types.js";
-import { PROTOCOL_VERSION } from "./types.js";
+import { PROTOCOL_VERSION, PluginAdapterError } from "./types.js";
 
 /**
  * Verify the protocol version the Hub expects (passed via the
@@ -292,6 +292,8 @@ export function createStdioServer(
           sendResponse(req.id, true, await open.call(adapter, {
             plugin_id: (params.PluginID as string) || "",
             cwd: (params.Cwd as string) || "",
+            native_session_id: (params.NativeSessionID as string) || "",
+            native_thread_id: (params.NativeThreadID as string) || "",
           }));
           break;
         }
@@ -308,6 +310,15 @@ export function createStdioServer(
           subscriptions.set(subscriptionId, controller);
           sendResponse(req.id, true, { subscribed: true, subscription_id: subscriptionId });
           pumpEvents(subscriptionId, session, controller.signal).catch(() => {});
+          break;
+        }
+        case "adapter.ackEvent": {
+          if (typeof adapter.ackEvent !== "function") {
+            sendResponse(req.id, false, undefined, { code: "not_implemented", message: "adapter does not implement ackEvent" });
+            break;
+          }
+          await adapter.ackEvent(params.Session as NativeSession, (params.EventID as string) || "");
+          sendResponse(req.id, true, { ok: true });
           break;
         }
         case "adapter.subscribePlugin": {
@@ -377,7 +388,7 @@ export function createStdioServer(
       }
     } catch (err) {
       sendResponse(req.id, false, undefined, {
-        code: "adapter_error",
+        code: err instanceof PluginAdapterError ? err.code : "adapter_error",
         message: err instanceof Error ? err.message : String(err),
       });
     }
