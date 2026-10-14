@@ -18,6 +18,7 @@ const sharedFixture = JSON.parse(readFileSync(fileURLToPath(new URL("../../../..
 };
 
 class StubAdapter implements PluginAdapter {
+  resolvedApproval?: ApprovalResolutionRequest;
   id() { return "stub"; }
   probe(): Capability {
     return {
@@ -47,7 +48,7 @@ class StubAdapter implements PluginAdapter {
     return [{ PluginID: "stub", NativeSessionID: "s", NativeThreadID: "", Surface: "test", Endpoint: "", Cwd: "", Title: "Stub Session", PrismConversationID: "", Active: true, Visible: true, LastActivityAt: new Date().toISOString(), Metadata: {} }];
   }
   async attachSession(req: AttachSessionRequest) { return { PluginID: "stub", NativeSessionID: req.NativeSessionID, NativeThreadID: "", Surface: "test", Endpoint: "", Cwd: req.Cwd, Visible: true }; }
-  async resolveApproval(_req: ApprovalResolutionRequest) {}
+  async resolveApproval(req: ApprovalResolutionRequest) { this.resolvedApproval = req; }
   async send() { return { NativeMessageID: "r", Accepted: true, Visible: true, QueuePending: true, Detail: "" }; }
   async *subscribe() { /* no events */ }
   async interrupt() {}
@@ -252,6 +253,7 @@ test("durable detail uses the direct snake_case wire projection", async () => {
 });
 
 test("resolve approval returns ok", async () => {
+  const adapter = new StubAdapter();
   const out = await runRoundTrip(JSON.stringify({
     id: "req-resolve",
     method: "adapter.resolveApproval",
@@ -265,10 +267,12 @@ test("resolve approval returns ok", async () => {
       source_device: "glasses",
       metadata: { k: "v" },
     },
-  }) + "\n");
+  }) + "\n", adapter);
   const resp = JSON.parse(out.trim()) as RpcResponse;
   assert.equal(resp.id, "req-resolve");
   assert.equal(resp.ok, true);
+  assert.equal(adapter.resolvedApproval?.ApprovalRequestID, "approval-1");
+  assert.equal(adapter.resolvedApproval?.ActionID, "approve_with_note");
 });
 
 test("send receipt exposes queue_pending on the snake_case wire", async () => {

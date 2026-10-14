@@ -250,7 +250,7 @@ export function createStdioServer(
             break;
           }
           const r = params as unknown as ApprovalResolutionRequest;
-          await resolve(r);
+          await resolve.call(adapter, r);
           sendResponse(req.id, true, { ok: true });
           break;
         }
