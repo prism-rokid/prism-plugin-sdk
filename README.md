@@ -59,6 +59,20 @@ Your devices talk to the Prism cloud, the cloud talks to the Prism Hub running o
 
 Plugins connect in one of two ways: **protocol-native** plugins talk to the agent through its own protocol (an API, RPC, or CLI), while **desktop-automation** plugins drive the agent's desktop app when no protocol is available. Plugins are distributed as GitHub Releases; the Hub discovers, installs, and updates them automatically.
 
+### GitHub App and Registry release delivery
+
+Official plugins are discovered through the Prism Plugin Registry. A plugin developer only publishes immutable GitHub Releases; neither an OSS credential, Registry administrator token, nor a GitHub personal access token is required.
+
+Repository maintainers should install the organization-managed **Prism Plugin Registry** GitHub App on the plugin repository with these minimum settings:
+
+- Repository access: select only the plugin repository.
+- Repository permissions: `Contents: Read-only` and `Metadata: Read-only`.
+- Subscribe to the `Release` webhook event. The platform will provide the HTTPS webhook endpoint and secret out of band; do not place that secret in repository code, Actions variables, artifacts, or issue comments.
+
+For a production release, create a non-draft, non-prerelease tag named `v<semver>` and attach `plugin-release.json` plus the platform archives. The Registry accepts only the `release.published` event, verifies the webhook HMAC, repository, tag and manifest identity, and then places the plugin and Release in approval. A platform reviewer must approve the plugin first and the specific Release second before it appears in the Hub and Panel catalogs.
+
+GitHub Release remains the primary download source. Platform infrastructure may make a verified, immutable OSS/CDN backup after publication. The Hub uses that backup only when the GitHub asset request fails, and verifies the Registry-supplied SHA-256 before installing. Plugin maintainers do not upload to OSS and must never receive platform OSS or Registry credentials.
+
 ## About this SDK
 
 The PluginBridge SDK is everything you need to build a Prism plugin in Go, TypeScript/Node.js, or Python. A plugin is a small program described by a `pluginbridge-plugin.yaml` manifest; the Prism Hub launches it and speaks the PluginBridge v4 protocol to it over JSON-lines stdio. All three SDKs expose the same `serve` entry point — you implement handlers with idiomatic language-native types, and the SDK converts them to the locked snake_case wire protocol.
@@ -209,6 +223,20 @@ flowchart LR
 | [prism-plugin-openclaw](https://github.com/prism-rokid/prism-plugin-openclaw) | OpenClaw 官方插件 — 协议原生，对接 OpenClaw 网关 |
 
 插件以两种方式之一接入智能体：**协议原生**通过智能体自身的协议（API、RPC 或 CLI）通信；**桌面自动化**在没有开放协议时操作智能体的桌面应用。插件以 GitHub Releases 分发，Hub 会自动发现、安装并更新它们。
+
+### GitHub App 与 Registry 发布接入
+
+官方插件通过 Prism Plugin Registry 被发现。插件开发者只需要发布不可变的 GitHub Release，**不需要** OSS 凭据、Registry 管理员 Token 或 GitHub PAT。
+
+仓库维护者应将组织统一管理的 **Prism Plugin Registry** GitHub App 安装到对应插件仓库，并采用最小权限：
+
+- 仓库范围：仅选择该插件仓库。
+- 仓库权限：`Contents: Read-only`、`Metadata: Read-only`。
+- 订阅 `Release` Webhook 事件。平台会通过安全渠道提供 HTTPS Webhook 地址和 Secret；不得将 Secret 写入仓库代码、Actions 变量、构建产物或 Issue 评论。
+
+发布正式版本时，创建非 draft、非 prerelease 的 `v<semver>` Tag，并上传 `plugin-release.json` 与各平台安装包。Registry 只处理 `release.published`，会验证 Webhook HMAC、仓库、Tag 和 Manifest 身份，然后将插件及该 Release 置为待审核。平台审核人必须先批准插件、再批准具体 Release，才会出现在 Hub 和 Panel 目录中。
+
+GitHub Release 始终是首选下载源。平台基础设施可在发布后对已验证产物创建不可变的 OSS/CDN 备份；Hub 仅在 GitHub 资产请求失败时才使用备份，并在安装前校验 Registry 提供的 SHA-256。插件维护者不上传 OSS，也绝不能获得平台 OSS 或 Registry 凭据。
 
 ## SDK 简介
 
