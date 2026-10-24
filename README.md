@@ -59,19 +59,49 @@ Your devices talk to the Prism cloud, the cloud talks to the Prism Hub running o
 
 Plugins connect in one of two ways: **protocol-native** plugins talk to the agent through its own protocol (an API, RPC, or CLI), while **desktop-automation** plugins drive the agent's desktop app when no protocol is available. Plugins are distributed as GitHub Releases; the Hub discovers, installs, and updates them automatically.
 
-### GitHub App and Registry release delivery
+### Publish through the Prism Plugin Registry
 
-Official plugins are discovered through the Prism Plugin Registry. A plugin developer only publishes immutable GitHub Releases; neither an OSS credential, Registry administrator token, nor a GitHub personal access token is required.
+The Prism Plugin Registry lets a plugin published on GitHub be reviewed and, once approved, discovered by Prism Hub and Prism Panel. A plugin developer owns the source repository and GitHub Releases. Prism operates the Registry, its GitHub App, webhook endpoint, review process, and optional artifact backup.
 
-Repository maintainers should install the organization-managed **Prism Plugin Registry** GitHub App on the plugin repository with these minimum settings:
+#### 1. Request repository access
 
-- Repository access: select only the plugin repository.
-- Repository permissions: `Contents: Read-only`, `Metadata: Read-only`, and `Checks: Read & write`.
-- Subscribe to the `Release` webhook event. The platform will provide the HTTPS webhook endpoint and secret out of band; do not place that secret in repository code, Actions variables, artifacts, or issue comments.
+Before your first release, ask the Prism maintainers to register your repository and install the organization-managed **Prism Plugin Registry** GitHub App. Include the repository URL and the plugin ID from `pluginbridge-plugin.yaml` in the request.
 
-For a production release, create a non-draft, non-prerelease tag named `v<semver>` and attach `plugin-release.json` plus the platform archives. The Registry accepts only the `release.published` event, verifies the webhook HMAC, repository, tag and manifest identity, and then places the plugin and Release in approval. A platform reviewer must approve the plugin first and the specific Release second before it appears in the Hub and Panel catalogs.
+An administrator of your GitHub organization or repository installs the existing App and selects only the plugin repository. Plugin developers do **not** create a GitHub App, configure a webhook URL or webhook secret, generate an App private key, or receive a GitHub personal access token for this integration.
 
-GitHub Release remains the primary download source. Platform infrastructure may make a verified, immutable OSS/CDN backup after publication. The Hub uses that backup only when the GitHub asset request fails, and verifies the Registry-supplied SHA-256 before installing. Plugin maintainers do not upload to OSS and must never receive platform OSS or Registry credentials. Review outcomes appear as a `Prism Plugin Registry` Check on the Release tag; rejected checks contain the reviewer-provided reason.
+The App is maintained by Prism with these repository permissions:
+
+- `Metadata: Read-only` and `Contents: Read-only`, to verify the published Release and its assets.
+- `Checks: Read & write`, to report the review result on the Release tag.
+- The `Release` webhook event, delivered directly from GitHub to the Prism Registry.
+
+Repository access is limited to the selected plugin repository. The App does not need write access to source code, Actions, issues, pull requests, or repository settings.
+
+#### 2. Publish a Release
+
+Create an immutable GitHub Release that is neither a draft nor a prerelease. Its tag must be `v<semver>` (for example, `v1.2.3`) and its assets must include:
+
+- `plugin-release.json`, conforming to [`conformance/plugin-release.schema.json`](conformance/plugin-release.schema.json).
+- The platform installation archives named by `plugin-release.json`.
+- A `plugin_id` and version that match the manifest and Release tag.
+
+Publishing the Release emits GitHub's `release.published` event. The Registry verifies the webhook signature, repository, tag, manifest, assets, and checksums. A valid event creates or updates a pending plugin and pending Release; it does not make the plugin public yet. A changed release must use a new version and a new tag. Do not replace assets for a published tag.
+
+#### 3. Review and visibility
+
+Prism reviews the plugin directory first, then each Release. Only an approved plugin with an approved stable Release appears in the Hub and Panel catalogs. The Registry publishes a **Prism Plugin Registry** Check on the Release tag after a review decision:
+
+| Check result | Meaning | What to do |
+| --- | --- | --- |
+| `success` | The Release is approved and available to users. | No action required. |
+| `failure` | The plugin or Release was not approved. | Open the Check details to read the reviewer reason, then publish a corrected new version. |
+| `neutral` | A previously approved Release was withdrawn. | Do not use that version; publish a replacement Release if appropriate. |
+
+#### Download and credential boundaries
+
+GitHub Release is always the primary download source. Prism may create a verified, immutable OSS/CDN backup after publication; Hub uses it only when the GitHub asset cannot be fetched and still verifies the Registry-provided SHA-256 before installation.
+
+Plugin developers upload only to GitHub Releases. They never receive or configure Registry administrator credentials, webhook secrets, GitHub App private keys, OSS credentials, or CDN credentials. Do not place any of those values in repository code, GitHub Actions secrets or variables, artifacts, or issue comments.
 
 ## About this SDK
 
@@ -224,19 +254,49 @@ flowchart LR
 
 插件以两种方式之一接入智能体：**协议原生**通过智能体自身的协议（API、RPC 或 CLI）通信；**桌面自动化**在没有开放协议时操作智能体的桌面应用。插件以 GitHub Releases 分发，Hub 会自动发现、安装并更新它们。
 
-### GitHub App 与 Registry 发布接入
+### 通过 Prism Plugin Registry 发布插件
 
-官方插件通过 Prism Plugin Registry 被发现。插件开发者只需要发布不可变的 GitHub Release，**不需要** OSS 凭据、Registry 管理员 Token 或 GitHub PAT。
+Prism Plugin Registry 负责对 GitHub 上发布的插件进行审核，并让通过审核的插件被 Prism Hub 和 Prism Panel 发现。插件开发者负责源代码仓库和 GitHub Release；Registry、GitHub App、Webhook 接口、审核流程及可选的产物备份均由 Prism 平台维护。
 
-仓库维护者应将组织统一管理的 **Prism Plugin Registry** GitHub App 安装到对应插件仓库，并采用最小权限：
+#### 1. 申请仓库接入
 
-- 仓库范围：仅选择该插件仓库。
-- 仓库权限：`Contents: Read-only`、`Metadata: Read-only`、`Checks: Read & write`。
-- 订阅 `Release` Webhook 事件。平台会通过安全渠道提供 HTTPS Webhook 地址和 Secret；不得将 Secret 写入仓库代码、Actions 变量、构建产物或 Issue 评论。
+首次发布前，请向 Prism 维护者申请注册仓库并安装组织统一管理的 **Prism Plugin Registry** GitHub App。申请时提供仓库 URL，以及 `pluginbridge-plugin.yaml` 中的插件 ID。
 
-发布正式版本时，创建非 draft、非 prerelease 的 `v<semver>` Tag，并上传 `plugin-release.json` 与各平台安装包。Registry 只处理 `release.published`，会验证 Webhook HMAC、仓库、Tag 和 Manifest 身份，然后将插件及该 Release 置为待审核。平台审核人必须先批准插件、再批准具体 Release，才会出现在 Hub 和 Panel 目录中。
+GitHub 组织或仓库管理员只需要安装已有的 App，并选择该插件仓库。插件开发者**不需要**创建 GitHub App、配置 Webhook URL 或 Secret、生成 App 私钥，也不需要为本接入创建 GitHub PAT。
 
-GitHub Release 始终是首选下载源。平台基础设施可在发布后对已验证产物创建不可变的 OSS/CDN 备份；Hub 仅在 GitHub 资产请求失败时才使用备份，并在安装前校验 Registry 提供的 SHA-256。插件维护者不上传 OSS，也绝不能获得平台 OSS 或 Registry 凭据。审核结果会显示为 Release Tag 对应的 `Prism Plugin Registry` Check；拒绝时可在 Check 详情中看到审核原因。
+该 App 由 Prism 维护，仓库最小权限为：
+
+- `Metadata: Read-only` 和 `Contents: Read-only`：用于验证已发布的 Release 与资产。
+- `Checks: Read & write`：用于在 Release Tag 上写入审核结果。
+- 订阅 `Release` Webhook 事件：由 GitHub 直接投递到 Prism Registry。
+
+App 的仓库范围仅限被选择的插件仓库；不需要源代码、Actions、Issue、Pull Request 或仓库设置的写权限。
+
+#### 2. 发布 Release
+
+创建不可变的 GitHub Release，不能是 draft 或 prerelease。Tag 必须为 `v<semver>`，例如 `v1.2.3`，并上传以下资产：
+
+- 符合 [`conformance/plugin-release.schema.json`](conformance/plugin-release.schema.json) 的 `plugin-release.json`。
+- 由 `plugin-release.json` 声明的各平台安装包。
+- 与 manifest、Release Tag 一致的 `plugin_id` 和版本号。
+
+发布 Release 会触发 GitHub 的 `release.published` 事件。Registry 会验证 Webhook 签名、仓库、Tag、manifest、资产及校验和。校验成功后，插件和该 Release 会进入待审核状态，不会立即公开。已发布 Tag 的内容不得替换；需要修改时请发布新版本、新 Tag。
+
+#### 3. 审核结果与可见性
+
+Prism 先审核插件目录，再审核每个 Release。只有“已通过的插件”及其“已通过的 stable Release”才会出现在 Hub 和 Panel 目录中。审核完成后，Registry 会在 Release Tag 上写入 **Prism Plugin Registry** Check：
+
+| Check 结果 | 含义 | 开发者应做什么 |
+| --- | --- | --- |
+| `success` | Release 已审核通过，可被用户安装。 | 无需操作。 |
+| `failure` | 插件或 Release 未通过审核。 | 打开 Check 详情查看审核原因，修正后发布一个新版本。 |
+| `neutral` | 已通过审核的 Release 已被下架。 | 不再使用该版本；必要时发布替代 Release。 |
+
+#### 下载与凭据边界
+
+GitHub Release 始终是首选下载源。Prism 可在发布后为已验证产物创建不可变的 OSS/CDN 备份；仅当 Hub 无法下载 GitHub 资产时才使用备份，且安装前仍会校验 Registry 提供的 SHA-256。
+
+插件开发者只上传 GitHub Release，不会获得或配置 Registry 管理员凭据、Webhook Secret、GitHub App 私钥、OSS 凭据或 CDN 凭据。请勿将这些内容写入仓库代码、GitHub Actions 的 Secret 或变量、构建产物或 Issue 评论。
 
 ## SDK 简介
 
