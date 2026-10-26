@@ -63,11 +63,13 @@ Plugins connect in one of two ways: **protocol-native** plugins talk to the agen
 
 The Prism Plugin Registry lets a plugin published on GitHub be reviewed and, once approved, discovered by Prism Hub and Prism Panel. A plugin developer owns the source repository and GitHub Releases. Prism operates the Registry, its GitHub App, webhook endpoint, review process, and optional artifact backup.
 
-#### 1. Request repository access
+#### 1. Install the GitHub App and request review
 
-Before your first release, ask the Prism maintainers to register your repository and install the organization-managed **Prism Plugin Registry** GitHub App. Include the repository URL and the plugin ID from `pluginbridge-plugin.yaml` in the request.
+The **Prism Plugin Registry** GitHub App is not currently listed in GitHub Marketplace. To connect a repository, open [Prism Plugin Registry on GitHub](https://github.com/apps/prism-plugin-registry) and select **Install**. An administrator of the GitHub organization or repository should install the existing App and select only the plugin repository.
 
-An administrator of your GitHub organization or repository installs the existing App and selects only the plugin repository. Plugin developers do **not** create a GitHub App, configure a webhook URL or webhook secret, generate an App private key, or receive a GitHub personal access token for this integration.
+After installation, send the Prism maintainers the repository URL and the plugin ID from `pluginbridge-plugin.yaml` so the plugin can enter the review process. If your organization restricts GitHub App installations, ask an organization owner to complete the installation from the same link.
+
+Plugin developers do **not** create a GitHub App, configure a webhook URL or webhook secret, generate an App private key, or receive a GitHub personal access token for this integration.
 
 The App is maintained by Prism with these repository permissions:
 
@@ -258,11 +260,13 @@ flowchart LR
 
 Prism Plugin Registry 负责对 GitHub 上发布的插件进行审核，并让通过审核的插件被 Prism Hub 和 Prism Panel 发现。插件开发者负责源代码仓库和 GitHub Release；Registry、GitHub App、Webhook 接口、审核流程及可选的产物备份均由 Prism 平台维护。
 
-#### 1. 申请仓库接入
+#### 1. 安装 GitHub App 并申请审核
 
-首次发布前，请向 Prism 维护者申请注册仓库并安装组织统一管理的 **Prism Plugin Registry** GitHub App。申请时提供仓库 URL，以及 `pluginbridge-plugin.yaml` 中的插件 ID。
+**Prism Plugin Registry** GitHub App 当前尚未上架 GitHub Marketplace。请直接打开 [GitHub 上的 Prism Plugin Registry](https://github.com/apps/prism-plugin-registry)，点击 **Install** 安装。GitHub 组织或仓库管理员应安装已有的 App，并且只选择该插件仓库。
 
-GitHub 组织或仓库管理员只需要安装已有的 App，并选择该插件仓库。插件开发者**不需要**创建 GitHub App、配置 Webhook URL 或 Secret、生成 App 私钥，也不需要为本接入创建 GitHub PAT。
+安装完成后，请将仓库 URL 与 `pluginbridge-plugin.yaml` 中的插件 ID 提交给 Prism 维护者，以进入插件审核流程。如果组织策略限制 GitHub App 安装，请让组织 Owner 使用同一链接完成安装。
+
+插件开发者**不需要**创建 GitHub App、配置 Webhook URL 或 Secret、生成 App 私钥，也不需要为本接入创建 GitHub PAT。
 
 该 App 由 Prism 维护，仓库最小权限为：
 
