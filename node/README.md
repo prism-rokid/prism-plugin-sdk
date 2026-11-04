@@ -38,6 +38,10 @@ serve(new MyAdapter());
 
 See `example/index.ts` for a complete echo adapter.
 
+新插件还应从 SDK 源码仓库复制默认维护 Skill，支持本地诊断、修复及授权后的 PR/Issue
+贡献。安装命令与用户许可说明见 [SDK README](../README.md#本地问题分析与贡献-skill)；
+仅安装 npm 依赖不会启用 Skill。
+
 That example is intentionally minimal and is not a finished mobile/glasses
 remote-conversation plugin by itself.
 

@@ -135,6 +135,8 @@ from pluginbridge import serve
 - `python/` — the Python SDK, with its own [README](python/README.md), tests, and `python/example/`
 - `conformance/` — the strict JSON Schemas for plugin manifests and release metadata, plus validation fixtures
 - `actions/validate-official-manifest` — a reusable GitHub Action that enforces the official manifest rules in plugin release workflows
+- `.agents/skills/prism-plugin-maintainer/` — the shared local diagnosis and contribution Skill
+- `scripts/install-maintainer-skill.py` — copies the Skill into a new or existing plugin checkout
 
 ### Node module formats
 
@@ -173,6 +175,49 @@ publisher and PyPI trusted publisher for this repository before tagging.
 This repository's npm configuration defaults to the npmmirror registry for
 dependency installation. The release workflow explicitly switches publishing
 to the official npm registry, as required by npm Trusted Publishing.
+
+## Local diagnosis and contribution Skill
+
+Every official plugin repository includes [`prism-plugin-maintainer`](./.agents/skills/prism-plugin-maintainer/SKILL.md).
+It guides an agent through inspecting open-source plugin code locally, reproducing
+the problem, making a focused fix, and running the checks that support the result.
+If the local checkout cannot establish a reliable fix, it prepares a complete,
+sanitized Issue draft with the evidence and attempted diagnostics.
+
+The Skill is agent guidance, not a background uploader or a runtime SDK feature.
+Open the source checkout in an agent that discovers `.agents/skills`, or explicitly
+ask your agent to read the linked `SKILL.md`. Local diagnosis uses your chosen
+agent and its model provider under their existing data and usage settings; it
+does not imply offline processing. Only provide the files and sanitized diagnostic
+information needed for the task.
+
+Installation, reading this README, or asking for a local fix does not grant
+permission to publish. By default, the agent delivers a local fix or an Issue
+draft. Before requesting authorization, it prepares the diff, actual check
+results, target repository and branch, title, and sanitized body for review.
+You may authorize one complete PR workflow (commit, push, and PR creation), or
+explicitly authorize automatic Issue creation if local diagnosis cannot resolve
+the problem. Existing authorization is reused within its scope; new targets or
+operations require additional consent. GitHub authentication and repository
+permissions are also required. Public repositories make submitted material
+public; credentials, tokens, private paths, and unsanitized logs must never be
+copied into a PR or Issue. You may decline or withdraw publication permission
+and keep the local result.
+
+When starting a new plugin from the Go, Node, or Python examples, run this from
+the SDK source checkout (Python 3 required; the target directory must exist):
+
+```bash
+python3 scripts/install-maintainer-skill.py /path/to/new-plugin
+python3 scripts/install-maintainer-skill.py --check /path/to/new-plugin
+```
+
+The installer creates the required directories and refuses to overwrite
+different existing files. Review customizations before using `--update` to
+refresh SDK-managed files; extra plugin-specific files are retained. Keep the
+copied directory in the plugin repository so contributors receive the same
+workflow without a separate SDK checkout. Installing the Go/npm/PyPI SDK package
+alone does not install or activate repository Skills.
 
 ## Contributing
 
@@ -315,6 +360,44 @@ PluginBridge SDK 提供 Go、TypeScript/Node.js、Python 三种语言开发 Pris
 仓库结构：`example/` 是最小可运行的 Go 插件；`node/`、`python/` 分别是各自语言的 SDK（含独立 README 与示例）；`conformance/` 是 manifest 与 release 元数据的严格 JSON Schema 及校验夹具；`actions/validate-official-manifest` 是供插件发布流程复用的官方 manifest 校验 Action。
 
 manifest 契约、Node 模块格式、发布流程（OIDC trusted publishing）等技术细节见上方英文部分的 [About this SDK](#about-this-sdk)。
+
+## 本地问题分析与贡献 Skill
+
+每个官方插件仓库都默认包含
+[`prism-plugin-maintainer`](./.agents/skills/prism-plugin-maintainer/SKILL.md)。它指导
+智能体在本地阅读开源插件代码、复现问题、实施最小修复并运行与改动匹配的检查；
+如果本地无法可靠解决，则整理包含环境、复现步骤、实际与期望结果、诊断证据和已尝试
+方案的脱敏 Issue 草稿。
+
+Skill 是智能体工作指引，不是后台上传器或 SDK 运行时功能。请在支持 `.agents/skills`
+发现机制的智能体中打开源码仓库；其他客户端可直接要求智能体阅读上述 `SKILL.md`。
+“本地分析”指基于本地源码开展工作，仍使用你选择的智能体和模型服务商，遵循其已有的
+数据处理和用量设置，并不代表离线推理。只提供本任务必需的文件和脱敏诊断信息。
+
+安装插件、阅读 README 或要求本地修复，都不构成公开提交许可。默认只交付本地修复或
+Issue 草稿；申请发布许可前先准备可审阅的 diff、真实检查结果、目标仓库和分支、标题及
+脱敏正文。用户可以一次授权“commit、推送独立分支并创建 PR”整条流程，也可以明确授权
+“本地无法解决时自动创建 Issue”；智能体沿用范围内的已有授权，不重复询问，新增目标或
+操作才补充确认。提交还需要用户已有的 GitHub 登录和仓库权限。公开仓库中的提交内容将
+公开，PR 或 Issue 不得包含凭据、令牌、隐私路径和未经脱敏的原始日志。用户可拒绝或撤回
+发布许可，保留本地结果。
+
+新插件从 Go、Node 或 Python 示例初始化后，在 SDK 源码仓库内运行以下命令
+（需要 Python 3，目标插件目录须已存在）：
+
+```bash
+python3 scripts/install-maintainer-skill.py /path/to/new-plugin
+python3 scripts/install-maintainer-skill.py --check /path/to/new-plugin
+```
+
+工具会创建必要目录，默认拒绝覆盖已有的不同文件；审阅插件定制后，可用 `--update` 更新
+SDK 管理的文件，额外的插件专用文件会保留。复制后的目录应随插件仓库提交，这样贡献者
+即使没有单独的 SDK checkout，也能获得同一套流程。仅安装 Go/npm/PyPI SDK 依赖包不会
+自动安装或启用仓库 Skill。
+
+可直接给智能体这样的任务：“请阅读 `.agents/skills/prism-plugin-maintainer/SKILL.md`，
+分析这个插件故障，先完成本地修复和验证，再给我审阅 PR 草稿；无法解决时给我 Issue
+草稿。”希望自动提交时，再明确授权目标仓库以及允许的 PR 流程或 Issue 兜底操作。
 
 ## 如何贡献
 
