@@ -87,6 +87,13 @@ Create an immutable GitHub Release that is neither a draft nor a prerelease. Its
 - The platform installation archives named by `plugin-release.json`.
 - A `plugin_id` and version that match the manifest and Release tag.
 
+Use the reusable [`actions/create-release-metadata`](actions/create-release-metadata/action.yml)
+in the release workflow to generate `plugin-release.json`. It copies the common display
+fields from `pluginbridge-plugin.yaml` (`display_name`, `description`, `icon_url`, and
+`icon_svg_url`) and emits empty strings for optional fields that are not configured yet.
+Do not maintain a plugin-specific metadata generator. For local builds, the same generator
+is available as `npm run create-release-metadata -- <artifacts-directory>` in the Node SDK.
+
 Publishing the Release emits GitHub's `release.published` event. The Registry verifies the webhook signature, repository, tag, manifest, assets, and checksums. A valid event creates or updates a pending plugin and pending Release; it does not make the plugin public yet. A changed release must use a new version and a new tag. Do not replace assets for a published tag.
 
 #### 3. Review and visibility
@@ -137,6 +144,7 @@ from pluginbridge import serve
 - `actions/validate-official-manifest` — a reusable GitHub Action that enforces the official manifest rules in plugin release workflows
 - `.agents/skills/prism-plugin-maintainer/` — the shared local diagnosis and contribution Skill
 - `scripts/install-maintainer-skill.py` — copies the Skill into a new or existing plugin checkout
+- `actions/create-release-metadata` — a reusable GitHub Action that generates the checked release metadata
 
 ### Node module formats
 
@@ -164,7 +172,9 @@ for legacy and third-party compatibility.
 The SDK deliberately does not fetch, inline, inspect, or execute SVG files.
 
 [`conformance/plugin-release.schema.json`](conformance/plugin-release.schema.json) defines the signed/checked release
-metadata consumed by the Hub registry.
+metadata consumed by the Hub registry. Its display fields are optional for compatibility;
+the shared generator always emits them, using empty strings when a plugin has not configured
+an optional description or icon.
 
 ### Release
 

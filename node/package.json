@@ -23,6 +23,7 @@
   "files": [
     "dist",
     "runtime",
+    "scripts/create-release-metadata.mjs",
     "README.md"
   ],
   "scripts": {
@@ -33,6 +34,7 @@
     "test": "npm run build && node --test dist/esm/src/**/*.test.js && node -e \"require('./dist/cjs/src/index.js')\"",
     "validate-manifest": "node scripts/validate-manifest.mjs",
     "validate-official-manifest": "node scripts/validate-official-manifest.mjs",
+    "create-release-metadata": "node scripts/create-release-metadata.mjs",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

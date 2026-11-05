@@ -1,0 +1,16 @@
+name: Create PluginBridge release metadata
+description: 根据插件 manifest 和四个平台归档生成统一的 plugin-release.json
+inputs:
+  artifacts:
+    description: 包含平台归档的目录
+    required: false
+    default: release-artifacts
+  manifest:
+    description: 插件 manifest 路径
+    required: false
+    default: pluginbridge-plugin.yaml
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: node "$GITHUB_ACTION_PATH/../../node/scripts/create-release-metadata.mjs" "${{ inputs.artifacts }}" "${{ inputs.manifest }}"
