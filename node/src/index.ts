@@ -18,6 +18,7 @@ export type {
   ApprovalResolver,
   AttachSessionRequest,
   Capability,
+  Diagnostic,
   ControlSessionRequest,
   ControlSessionResult,
   DiscoveryResult,

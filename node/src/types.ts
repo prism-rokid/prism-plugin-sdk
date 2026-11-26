@@ -10,7 +10,22 @@ export const PROTOCOL_VERSION = "4";
 
 export type IntegrationMode = "protocol-native" | "desktop-automation";
 
+export interface Diagnostic {
+  State: string;
+  Code: string;
+  Summary: string;
+  Detail?: string;
+  Component?: string;
+  ActualVersion?: string;
+  RequiredVersion?: string;
+  Actions?: string[];
+  Facts?: Record<string, unknown>;
+  Stack?: string;
+  Metadata?: Record<string, string>;
+}
+
 export interface Capability {
+  Diagnostics?: Diagnostic;
   PluginID: string;
   Available: boolean;
   NativeVisibleInput: boolean;

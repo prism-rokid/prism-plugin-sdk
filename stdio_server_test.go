@@ -384,3 +384,47 @@ func (a *fixtureAdapter) ControlSession(_ context.Context, req ControlSessionReq
 func (a *fixtureAdapter) SubscribePlugin(context.Context) (<-chan PluginEvent, error) {
 	return a.events, nil
 }
+
+func TestCapabilityDiagnosticsJSON(t *testing.T) {
+	d := Diagnostic{
+		State: "unavailable", Code: "test", Summary: "摘要", Detail: "详情", Component: "agent",
+		ActualVersion: "1.0", RequiredVersion: ">=2", Actions: []string{"recheck"},
+		Facts: map[string]any{"installed": true}, Stack: "调用栈", Metadata: map[string]string{"source": "probe"},
+	}
+	capability := Capability{Diagnostics: &d, UnavailableReason: "摘要"}
+	direct, err := json.Marshal(capability)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fields struct{ Diagnostics map[string]any }
+	if err := json.Unmarshal(direct, &fields); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"State", "Code", "Summary", "Detail", "Component", "ActualVersion", "RequiredVersion", "Actions", "Facts", "Stack", "Metadata"} {
+		if _, ok := fields.Diagnostics[key]; !ok {
+			t.Errorf("缺少 JSON 字段 %s", key)
+		}
+	}
+	wire, err := marshalWire(capability)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded Capability
+	if err := unmarshalWire(wire, &decoded); err != nil {
+		t.Fatal(err)
+	}
+	if decoded.Diagnostics == nil || !reflect.DeepEqual(*decoded.Diagnostics, d) || decoded.UnavailableReason != capability.UnavailableReason {
+		t.Fatalf("往返序列化失败 %#v", decoded)
+	}
+	legacy, err := marshalWire(Capability{UnavailableReason: "旧版"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var legacyFields map[string]any
+	if err := json.Unmarshal(legacy, &legacyFields); err != nil {
+		t.Fatal(err)
+	}
+	if _, present := legacyFields["diagnostics"]; present || legacyFields["unavailable_reason"] != "旧版" {
+		t.Fatalf("旧版字段不兼容 %s", legacy)
+	}
+}

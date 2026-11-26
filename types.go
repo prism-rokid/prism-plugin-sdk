@@ -204,6 +204,20 @@ const (
 	IntegrationModeDesktopAutomation IntegrationMode = "desktop-automation"
 )
 
+type Diagnostic struct {
+	State           string            `json:"State,omitempty"`
+	Code            string            `json:"Code,omitempty"`
+	Summary         string            `json:"Summary,omitempty"`
+	Detail          string            `json:"Detail,omitempty"`
+	Component       string            `json:"Component,omitempty"`
+	ActualVersion   string            `json:"ActualVersion,omitempty"`
+	RequiredVersion string            `json:"RequiredVersion,omitempty"`
+	Actions         []string          `json:"Actions,omitempty"`
+	Facts           map[string]any    `json:"Facts,omitempty"`
+	Stack           string            `json:"Stack,omitempty"`
+	Metadata        map[string]string `json:"Metadata,omitempty"`
+}
+
 type Capability struct {
 	PluginID                   string `json:"PluginID"`
 	Available                  bool   `json:"Available"`
@@ -251,6 +265,8 @@ type Capability struct {
 	IntegrationMode   IntegrationMode `json:"IntegrationMode"`
 	VisibilitySurface string          `json:"VisibilitySurface"`
 	UnavailableReason string          `json:"UnavailableReason"`
+
+	Diagnostics *Diagnostic `json:"Diagnostics,omitempty"`
 }
 
 type DiscoveryResult struct {

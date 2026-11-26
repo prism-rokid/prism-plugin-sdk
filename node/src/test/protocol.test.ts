@@ -504,3 +504,25 @@ test("capability wire field names are snake_case", () => {
     assert.ok(key in wire, `expected snake_case key ${key} in wire capability`);
   }
 });
+
+test("诊断类型保留 PascalCase JSON 字段，v4 探测使用 snake_case", async () => {
+  const diagnostics: import("../index.js").Diagnostic = {
+    State: "unavailable", Code: "test", Summary: "摘要", Detail: "详情", Component: "agent",
+    ActualVersion: "1.0", RequiredVersion: ">=2", Actions: ["recheck"],
+    Facts: { installed: true }, Stack: "调用栈", Metadata: { source: "probe" },
+  };
+  const adapter = new StubAdapter();
+  const legacy = adapter.probe();
+  const capability: Capability = { ...legacy, Diagnostics: diagnostics, UnavailableReason: "摘要" };
+  assert.deepEqual(JSON.parse(JSON.stringify(capability)).Diagnostics, diagnostics);
+  const request = JSON.stringify({ id: "probe", method: "adapter.probe" }) + "\n";
+  assert.equal(JSON.parse(await runRoundTrip(request, adapter)).payload.diagnostics, undefined);
+  adapter.probe = () => capability;
+  const { payload } = JSON.parse(await runRoundTrip(request, adapter));
+  assert.deepEqual(payload.diagnostics, {
+    state: "unavailable", code: "test", summary: "摘要", detail: "详情", component: "agent",
+    actual_version: "1.0", required_version: ">=2", actions: ["recheck"],
+    facts: { installed: true }, stack: "调用栈", metadata: { source: "probe" },
+  });
+  assert.equal(payload.unavailable_reason, "摘要");
+});
